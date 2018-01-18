@@ -8,3 +8,7 @@ class SolvianMlApiUserError(SolvianError, RuntimeError):
 
 class ClassNotFoundInBagError(SolvianMlApiUserError):
     pass
+
+
+class NotFittedError(SolvianMlApiUserError):
+    pass

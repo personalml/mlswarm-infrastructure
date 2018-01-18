@@ -12,7 +12,7 @@ setup(
     description='Infrastructure for solvian ML services.',
     keywords=['machine-learning'],
     version='0.1',
-    packages=['solvian.infrastructure'],
+    packages=['solvian.ml.infrastructure'],
     scripts=[],
 
     author='Lucas David',
