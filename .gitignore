@@ -1,0 +1,10 @@
+.idea/
+data*/
+__pycache__/
+*.pyc/
+ckpt/
+logs/
+*.csv
+dist/
+build/
+**.egg-info/
