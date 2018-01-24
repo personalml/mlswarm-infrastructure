@@ -4,9 +4,10 @@ import abc
 class IEstimator(metaclass=abc.ABCMeta):
     def __init__(self,
                  input_units,
-                 inner_units, output_units,
+                 inner_units,
+                 output_units,
                  inner_layers=2,
-                 activation='relu',
+                 activations='relu',
                  target='Label',
                  trained=False,
                  **kwargs):
@@ -14,7 +15,7 @@ class IEstimator(metaclass=abc.ABCMeta):
         self.output_units = output_units
         self.inner_layers = inner_layers
         self.units = inner_units
-        self.activation = activation
+        self.activations = activations
         self.target = target
         self._kwargs = kwargs
 
