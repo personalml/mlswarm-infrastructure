@@ -4,20 +4,12 @@ import abc
 class IEstimator(metaclass=abc.ABCMeta):
     def __init__(self,
                  input_units,
-                 inner_units,
                  output_units,
-                 inner_layers=2,
-                 activations='relu',
                  target='Label',
-                 trained=False,
-                 **kwargs):
+                 trained=False):
         self.input_units = input_units
         self.output_units = output_units
-        self.inner_layers = inner_layers
-        self.units = inner_units
-        self.activations = activations
         self.target = target
-        self._kwargs = kwargs
 
         self.trained_ = trained
 
@@ -29,3 +21,20 @@ class IEstimator(metaclass=abc.ABCMeta):
 
     def predict(self, d, *args, **params):
         raise NotImplementedError
+
+
+class INetworkEstimator(IEstimator, metaclass=abc.ABCMeta):
+    def __init__(self,
+                 input_units,
+                 output_units,
+                 inner_units=None,
+                 inner_layers=2,
+                 activations='relu',
+                 target='Label',
+                 trained=False):
+        super().__init__(input_units, output_units, target, trained)
+        self.input_units = input_units
+        self.output_units = output_units
+        self.inner_layers = inner_layers
+        self.inner_units = inner_units
+        self.activations = activations
