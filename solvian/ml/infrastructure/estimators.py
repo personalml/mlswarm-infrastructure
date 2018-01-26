@@ -13,15 +13,6 @@ class IEstimator(metaclass=abc.ABCMeta):
 
         self.trained_ = trained
 
-    def train(self, d, *args, **params):
-        raise NotImplementedError
-
-    def test(self, d, *args, **params):
-        raise NotImplementedError
-
-    def predict(self, d, *args, **params):
-        raise NotImplementedError
-
 
 class INetworkEstimator(IEstimator, metaclass=abc.ABCMeta):
     def __init__(self,
