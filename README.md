@@ -4,9 +4,13 @@ Machine Learning infrastructure for Solvian services.
 
 ## Installing
 
+Consider either using docker or a virtualenv to separate your python packages
+from the system's. The virtualenv option is demonstrated bellow: 
+
 ```shell
-cd ./solvian-ml/
-python setup.py install
+virtualenv ~/envs/sml/ --python /usr/bin/python3
+source ~/envs/sml/bin/activate
+python setup.py install  # or develop
 ```
 
 ## Usage Example
