@@ -62,7 +62,7 @@ class JsonParser(IParser):
                  content,
                  to_lowercase=False,
                  ignore_features=(),
-                 normalize=True,
+                 normalize=False,
                  record_path=None,
                  meta=None):
         super().__init__(content,
