@@ -1,2 +1,2 @@
 from .bag import Bag
-from .estimators import IEstimator
+from .estimators import IEstimator, INetworkEstimator
