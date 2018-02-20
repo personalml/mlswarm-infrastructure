@@ -1,6 +1,6 @@
-# Solvian Machine Learning
+# Machine Learning Swarm Infrastructure
 
-Machine Learning infrastructure for Solvian services.
+Basic infrastructure for Machine Learning Swarm usage.
 
 ## Installing
 
@@ -14,18 +14,18 @@ python setup.py install  # or develop
 ```
 
 ## Usage Example
-
 ### Parsers
 
 A few parsers are implemented to convert json and csv files into
 a pandas DataFrame, ideal to feed machine learning models with:
 
 ```python
-from solvian.ml.infrastructure.parsers import JsonParser
+from mlswarm.infrastructure.parsers import JsonParser
+from some_ml_service import SomeMachineLearningModel
 
 parser = JsonParser(content='path/to/file.json',
                     ignore_features=['temperature'])
-# or `parser = CsvParser(content='path/to/file.csv', ...)`
+# `parser = CsvParser(content='path/to/file.csv', ...)`
 
 d = parser.process()
 
