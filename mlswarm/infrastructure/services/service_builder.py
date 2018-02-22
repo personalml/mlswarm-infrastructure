@@ -1,7 +1,7 @@
-from . import errors
+from .. import errors
 
 
-class Bag:
+class ServiceBuilder:
     def __init__(self, classes: dict):
         self.classes = classes
 

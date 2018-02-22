@@ -9,10 +9,7 @@ import pandas.io.json
 
 
 class IParser(metaclass=abc.ABCMeta):
-    def __init__(self,
-                 content,
-                 to_lowercase=False,
-                 ignore_features=()):
+    def __init__(self, content, to_lowercase=False, ignore_features=None):
         self.content = content
         self.to_lowercase = to_lowercase
         self.ignore_features = ignore_features
@@ -39,13 +36,9 @@ class IParser(metaclass=abc.ABCMeta):
         return d
 
 
-class CsvParser(IParser):
-    def __init__(self,
-                 content,
-                 to_lowercase=False,
-                 ignore_features=(),
-                 delimiter=','):
-        super().__init__(content, to_lowercase, ignore_features)
+class CSVParser(IParser):
+    def __init__(self, *args, delimiter=',', **kwargs):
+        super().__init__(*args, **kwargs)
         self.delimiter = delimiter
 
     def parse(self):
@@ -57,17 +50,9 @@ class CsvParser(IParser):
             return pd.read_csv(StringIO(self.content), delimiter=self.delimiter)
 
 
-class JsonParser(IParser):
-    def __init__(self,
-                 content,
-                 to_lowercase=False,
-                 ignore_features=(),
-                 normalize=False,
-                 record_path=None,
-                 meta=None):
-        super().__init__(content,
-                         to_lowercase=to_lowercase,
-                         ignore_features=ignore_features)
+class JSONParser(IParser):
+    def __init__(self, *args, normalize=False, record_path=None, meta=None, **kwargs):
+        super().__init__(*args, **kwargs)
         self.normalize = normalize
         self.record_path = record_path
         self.meta = meta
