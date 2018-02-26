@@ -11,7 +11,13 @@ class IEstimator(ServiceSerializerMixin,
 
 
 class SimpleDenseNetworkClassifier(IEstimator):
-    class Train(Serializer):
+    class Task(Serializer):
+        batch_size = serializers.IntegerField(
+            min_value=1,
+            max_value=8192,
+            help_text='Sample count in a processing batch.')
+
+    class Training(Task):
         learning_rate = serializers.FloatField(
             min_value=0,
             default=0.01,
@@ -24,9 +30,18 @@ class SimpleDenseNetworkClassifier(IEstimator):
         dropout = serializers.FloatField(
             min_value=0,
             max_value=1,
-            default=0,
+            default=0.5,
             help_text='Dropout probability rate used in the dropout layers. '
                       '0 means no dropout at all.')
+
+    class Testing(Task):
+        metrics = serializers.ListField(
+            child=serializers.CharField(),
+            min_length=1,
+            help_text='Metrics to be computed in this test.')
+
+    class Prediction(Task):
+        pass
 
     input_units = serializers.IntegerField(min_value=1, required=True)
     inner_units = serializers.IntegerField(min_value=1, required=True)
@@ -38,8 +53,11 @@ class SimpleDenseNetworkClassifier(IEstimator):
 
 
 class SimpleRegressor(IEstimator):
-    class Train(Serializer):
+    class Training(Serializer):
         max_iterations = serializers.IntegerField(min_value=-1)
+
+    class Prediction(Serializer):
+        pass
 
     input_units = serializers.IntegerField(min_value=1, required=True)
     output_units = serializers.IntegerField(min_value=1, required=True)

@@ -19,7 +19,8 @@ class IParser(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError
 
-    def process(self):
+    @property
+    def processed(self):
         d = self.parse()
 
         if self.ignore_features:

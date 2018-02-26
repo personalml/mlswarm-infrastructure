@@ -17,7 +17,7 @@ class BaseParserSerializer(ServiceSerializerMixin,
 
 
 class CSVParserSerializer(BaseParserSerializer):
-    parser_cls = CSVParser
+    service_cls = CSVParser
 
     delimiter = serializers.CharField(
         max_length=1,
@@ -26,7 +26,7 @@ class CSVParserSerializer(BaseParserSerializer):
 
 
 class JSONParserSerializer(BaseParserSerializer):
-    parser_cls = JSONParser
+    service_cls = JSONParser
 
     normalize = serializers.BooleanField(default=False)
     record_path = serializers.CharField(default=None, allow_null=True)
