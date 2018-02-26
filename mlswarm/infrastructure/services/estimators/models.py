@@ -1,9 +1,13 @@
 import abc
 
+from keras import Model, Input, callbacks, backend as K
+from keras.layers import Dense, Dropout
+from keras.utils import to_categorical
+
 
 class IEstimator(metaclass=abc.ABCMeta):
-    def __init__(self, **data):
-        self.__dict__ = data
+    def __init__(self, target=None):
+        self.target = target
 
     def train(self, d, **params):
         raise NotImplementedError
@@ -14,10 +18,67 @@ class IEstimator(metaclass=abc.ABCMeta):
     def predict(self, d, **params):
         raise NotImplementedError
 
+    def dispose(self):
+        raise NotImplementedError
+
 
 class SimpleDenseNetworkClassifier(IEstimator):
+    def __init__(self, input_units, output_units,
+                 inner_units, inner_layers,
+                 activations='relu',
+                 target='label'):
+        super().__init__(target=target)
+        self.input_units = input_units
+        self.output_units = output_units
+        self.inner_units = inner_units
+        self.inner_layers = inner_layers
+        self.activations = activations
+        self.model_ = None
+
+    def build(self, dropout=0.0):
+        y = x = Input(shape=[self.input_units])
+
+        for i in range(self.inner_layers):
+            y = Dense(self.inner_units, activation=self.activations, name='fc_%i' % i)(y)
+            y = Dropout(rate=dropout, name='dr_%i' % i)(y)
+
+        y = Dense(self.output_units, name='predictions')(y)
+        self.model_ = Model(inputs=x, outputs=y)
+
+    def dispose(self):
+        if self.model_ is not None:
+            self.model_ = None
+            K.clear_session()
+
     def train(self, d, **params):
-        return {'trained': 'ok'}
+        dropout, report_dir, batch_size = (params.get(p) for p in ('dropout',
+                                                                   'report_dir',
+                                                                   'batch_size'))
+
+        x = d[[c for c in d.columns if c != self.target]]
+        y = d[self.target]
+        y = to_categorical(y)
+
+        self.build(dropout=dropout)
+
+        report = self.model_.fit(x, y,
+                                 batch_size=batch_size,
+                                 epochs=params.get('epochs'),
+                                 verbose=2,
+                                 callbacks=[
+                                     callbacks.TerminateOnNaN(),
+                                     callbacks.TensorBoard(report_dir, batch_size=batch_size),
+                                     callbacks.ModelCheckpoint(report_dir, verbose=1, save_best_only=True)
+                                 ],
+                                 validation_split=params.get('validation_split'),
+                                 validation_data=None,
+                                 shuffle=True,
+                                 class_weight=None,
+                                 sample_weight=None,
+                                 initial_epoch=0,
+                                 steps_per_epoch=None,
+                                 validation_steps=None)
+        return report
 
     def test(self, d, **params):
         return {'tested': 'ok'}

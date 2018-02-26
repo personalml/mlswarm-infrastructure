@@ -10,6 +10,18 @@ class IEstimator(ServiceSerializerMixin,
     target = serializers.CharField(required=False)
 
 
+class ITrain(Serializer):
+    pass
+
+
+class ITest(Serializer):
+    pass
+
+
+class IPredict(Serializer):
+    pass
+
+
 class SimpleDenseNetworkClassifier(IEstimator):
     class Task(Serializer):
         batch_size = serializers.IntegerField(
@@ -17,7 +29,7 @@ class SimpleDenseNetworkClassifier(IEstimator):
             max_value=8192,
             help_text='Sample count in a processing batch.')
 
-    class Training(Task):
+    class Train(ITrain, Task):
         learning_rate = serializers.FloatField(
             min_value=0,
             default=0.01,
@@ -33,14 +45,19 @@ class SimpleDenseNetworkClassifier(IEstimator):
             default=0.5,
             help_text='Dropout probability rate used in the dropout layers. '
                       '0 means no dropout at all.')
+        validation_split = serializers.FloatField(
+            min_value=0.,
+            max_value=1.,
+            default=0.,
+            help_text='Amount of data used as validation.')
 
-    class Testing(Task):
+    class Test(ITest, Task):
         metrics = serializers.ListField(
             child=serializers.CharField(),
             min_length=1,
             help_text='Metrics to be computed in this test.')
 
-    class Prediction(Task):
+    class Predict(IPredict, Task):
         pass
 
     input_units = serializers.IntegerField(min_value=1, required=True)
@@ -53,10 +70,13 @@ class SimpleDenseNetworkClassifier(IEstimator):
 
 
 class SimpleRegressor(IEstimator):
-    class Training(Serializer):
+    class Train(ITrain):
         max_iterations = serializers.IntegerField(min_value=-1)
 
-    class Prediction(Serializer):
+    class Test(ITest):
+        pass
+
+    class Predict(IPredict):
         pass
 
     input_units = serializers.IntegerField(min_value=1, required=True)

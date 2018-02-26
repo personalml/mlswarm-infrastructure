@@ -6,8 +6,6 @@ from ...serializers import ServiceSerializerMixin
 
 class BaseParserSerializer(ServiceSerializerMixin,
                            serializers.Serializer):
-    content = serializers.CharField(
-        help_text='The data or a valid path to it.')
     to_lowercase = serializers.BooleanField(
         default=False,
         help_text='Lowercase all strings in {content}.')
@@ -19,6 +17,12 @@ class BaseParserSerializer(ServiceSerializerMixin,
 class CSVParserSerializer(BaseParserSerializer):
     service_cls = CSVParser
 
+    content = serializers.CharField(
+        required=True,
+        allow_null=False,
+        allow_blank=False,
+        help_text='The data or a valid path to it.')
+
     delimiter = serializers.CharField(
         max_length=1,
         default=',',
@@ -27,6 +31,11 @@ class CSVParserSerializer(BaseParserSerializer):
 
 class JSONParserSerializer(BaseParserSerializer):
     service_cls = JSONParser
+
+    content = serializers.JSONField(
+        required=True,
+        allow_null=False,
+        help_text='The data or a valid path to it.')
 
     normalize = serializers.BooleanField(default=False)
     record_path = serializers.CharField(default=None, allow_null=True)
