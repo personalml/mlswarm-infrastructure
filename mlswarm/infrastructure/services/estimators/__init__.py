@@ -1,1 +1,1 @@
-from .models import IEstimator, SimpleRegressor, SimpleDenseNetworkClassifier
+from .models import IEstimator, DummyRegressor, SimpleDenseNetworkClassifier

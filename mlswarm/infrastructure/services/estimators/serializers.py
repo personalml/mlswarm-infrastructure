@@ -10,26 +10,34 @@ class IEstimator(ServiceSerializerMixin,
     target = serializers.CharField(required=False)
 
 
-class ITrain(Serializer):
+class ITask(Serializer):
     pass
 
 
-class ITest(Serializer):
+class ITrain(ITask):
     pass
 
 
-class IPredict(Serializer):
+class ITest(ITask):
+    pass
+
+
+class IPredict(ITask):
     pass
 
 
 class SimpleDenseNetworkClassifier(IEstimator):
-    class Task(Serializer):
+    class Task(ITask, Serializer):
         batch_size = serializers.IntegerField(
             min_value=1,
             max_value=8192,
             help_text='Sample count in a processing batch.')
 
     class Train(ITrain, Task):
+        epochs = serializers.IntegerField(
+            min_value=1,
+            help_text='Epochs spent training your data.'
+        )
         learning_rate = serializers.FloatField(
             min_value=0,
             default=0.01,
@@ -69,9 +77,9 @@ class SimpleDenseNetworkClassifier(IEstimator):
     service_cls = models.SimpleDenseNetworkClassifier
 
 
-class SimpleRegressor(IEstimator):
+class DummyRegressor(IEstimator):
     class Train(ITrain):
-        max_iterations = serializers.IntegerField(min_value=-1)
+        pass
 
     class Test(ITest):
         pass
@@ -79,7 +87,4 @@ class SimpleRegressor(IEstimator):
     class Predict(IPredict):
         pass
 
-    input_units = serializers.IntegerField(min_value=1, required=True)
-    output_units = serializers.IntegerField(min_value=1, required=True)
-
-    service_cls = models.SimpleRegressor
+    service_cls = models.DummyRegressor

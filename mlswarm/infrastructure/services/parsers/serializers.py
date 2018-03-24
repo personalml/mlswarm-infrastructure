@@ -36,7 +36,3 @@ class JSONParserSerializer(BaseParserSerializer):
         required=True,
         allow_null=False,
         help_text='The data or a valid path to it.')
-
-    normalize = serializers.BooleanField(default=False)
-    record_path = serializers.CharField(default=None, allow_null=True)
-    meta = serializers.CharField(default=None, allow_null=True)

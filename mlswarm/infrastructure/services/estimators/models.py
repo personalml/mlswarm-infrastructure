@@ -1,7 +1,8 @@
 import abc
 
+from sklearn.preprocessing import CategoricalEncoder
 from keras import Model, Input, callbacks, backend as K
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout, BatchNormalization, Activation
 from keras.utils import to_categorical
 
 
@@ -22,6 +23,20 @@ class IEstimator(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
+class DummyRegressor(IEstimator):
+    def train(self, d, **params):
+        return {'trained': 'ok'}
+
+    def test(self, d, **params):
+        return {'tested': 'ok'}
+
+    def predict(self, d, **params):
+        return {'predicted': 'ok'}
+
+    def dispose(self):
+        pass
+
+
 class SimpleDenseNetworkClassifier(IEstimator):
     def __init__(self, input_units, output_units,
                  inner_units, inner_layers,
@@ -39,10 +54,12 @@ class SimpleDenseNetworkClassifier(IEstimator):
         y = x = Input(shape=[self.input_units])
 
         for i in range(self.inner_layers):
-            y = Dense(self.inner_units, activation=self.activations, name='fc_%i' % i)(y)
             y = Dropout(rate=dropout, name='dr_%i' % i)(y)
+            y = Dense(self.inner_units, use_bias=False, name='fc_%i' % i)(y)
+            y = BatchNormalization(name='bn_%i' % i)(y)
+            y = Activation(self.activations, name='ac_%i' % i)(y)
 
-        y = Dense(self.output_units, name='predictions')(y)
+        y = Dense(self.output_units, activation='softmax', name='predictions')(y)
         self.model_ = Model(inputs=x, outputs=y)
 
     def dispose(self):
@@ -50,11 +67,9 @@ class SimpleDenseNetworkClassifier(IEstimator):
             self.model_ = None
             K.clear_session()
 
-    def train(self, d, **params):
-        dropout, report_dir, batch_size = (params.get(p) for p in ('dropout',
-                                                                   'report_dir',
-                                                                   'batch_size'))
-
+    def train(self, d, report_dir=None, dropout=0.5, batch_size=32, **params):
+        # is_categorical = d.dtypes == object
+        # CategoricalEncoder
         x = d[[c for c in d.columns if c != self.target]]
         y = d[self.target]
         y = to_categorical(y)
@@ -78,18 +93,8 @@ class SimpleDenseNetworkClassifier(IEstimator):
                                  initial_epoch=0,
                                  steps_per_epoch=None,
                                  validation_steps=None)
-        return report
 
-    def test(self, d, **params):
-        return {'tested': 'ok'}
-
-    def predict(self, d, **params):
-        return {'predicted': 'ok'}
-
-
-class SimpleRegressor(IEstimator):
-    def train(self, d, **params):
-        return {'trained': 'ok'}
+        return {k: [float(_v) for _v in v] for k, v in report.history.items()}
 
     def test(self, d, **params):
         return {'tested': 'ok'}
