@@ -3,8 +3,7 @@ import os
 from typing import Dict
 
 import numpy as np
-from keras import Model, Input, callbacks, backend as K
-from keras import models
+from keras import Model, Input, callbacks, models, backend as K
 from keras.layers import Dense, Dropout, BatchNormalization, Activation
 from sklearn.base import TransformerMixin
 from sklearn.externals import joblib
@@ -149,24 +148,22 @@ class SimpleDenseNetworkClassifier(IEstimator):
         x = d[[c for c in d.columns if c != self.target]]
         x = self.preprocessor['x'].transform(x)
 
-        return (self.model
-                .predict(x, batch_size=batch_size, verbose=0)
-                .argmax(axis=-1)
-                .tolist())
+        y = self.model.predict(x, batch_size=batch_size, verbose=0)
+
+        return self.preprocessor['y'].inverse_transform(y).ravel().tolist()
 
     def save(self, directory: str):
         joblib.dump(self.preprocessor, os.path.join(directory, 'processor.p'))
         return self
 
     def load(self, directory: str):
-        if self.model is None:
-            self.build()
-
         self.preprocessor = joblib.load(os.path.join(directory, 'processor.p'))
-        self.model = models.load_model(os.path.join(directory, 'network.h5'))
+        self.build().load_weights(os.path.join(directory, 'network.h5'))
+
         return self
 
     def dispose(self):
         self.preprocessor = self.model = None
+        K.clear_session()
 
         return self
